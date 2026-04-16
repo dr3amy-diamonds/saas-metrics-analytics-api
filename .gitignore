@@ -1,0 +1,115 @@
+# Entornos virtuales de Python
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Archivos de caché
+.cache
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# IDE y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+.DS_Store
+.AppleDouble
+.LSOverride
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de configuración local
+.env
+.env.local
+.env.*.local
+
+# Base de datos
+*.db
+*.sqlite
+*.sqlite3
+database.db
+instance/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Node modules (para el frontend si se usa)
+node_modules/
+npm-debug.log
+yarn-error.log
+.npm
+
+# Dependencias del sistema
+.poetry.lock
+Pipfile.lock
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+*~
+
+# Archivos generados por pytest
+.pytest_cache/
+
+# Archivos de ejecución
+*.pid
+*.seed
+*.pid.lock
+
+# Directorios específicos del proyecto
+/database/*.db
+/database/*.sqlite3
+/database/migrations/*.backup
+/database/migrations/*.log
+/database/migrations/__pycache__/
+/database/seeders/__pycache__/
+/database/seeders/*.log
+/database/seeders/.pytest_cache/
+/backend/instance/
+/frontend/node_modules/
+/frontend/build/
+/frontend/dist/
+
+
