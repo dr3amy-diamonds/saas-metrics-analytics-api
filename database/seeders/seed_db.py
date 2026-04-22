@@ -8,7 +8,7 @@ import random
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 
-import psycopg3
+import psycopg2
 from faker import Faker
 
 # ── Configuración de conexión ─────────────────────────────────────────────────

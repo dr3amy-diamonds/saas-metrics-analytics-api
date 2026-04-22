@@ -51,4 +51,25 @@ class UserMetricsRow(BaseModel):
     total_subscribers: int
     market_share: str
 
+class UserMetrics(BaseModel):
+    plan_name: str
+    plan_total_revenue: Decimal
+    total_subscribers: int
+
+    class Config:
+        from_attributes = True
+
+class MetricsWithMarketShare(BaseModel):
+    """
+    Esquema de respuesta para métricas con Market Share calculado.
+    Implementa Opción A: Cálculo nativo en Python.
+    """
+    plan_name: str
+    plan_total_revenue: Decimal
+    total_subscribers: int
+    market_share: str  # "35.50%"
+
+    class Config:
+        from_attributes = True
+
 

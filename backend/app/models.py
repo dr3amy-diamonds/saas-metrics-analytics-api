@@ -1,6 +1,6 @@
 # -- PASO 0: Las Importaciones de SQLAlchemy --
 import uuid
-from database import Base
+from .database import Base
 from sqlalchemy import Column, String, Numeric, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 

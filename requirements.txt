@@ -1,93 +1,78 @@
-# ========================================================================
-#  SUBSCRIPTION METRICS PLATFORM - DEPENDENCIAS DEL PROYECTO
-# ========================================================================
-# Este archivo contiene todas las librerías necesarias para ejecutar
-# la plataforma de métricas de suscripciones SaaS.
-# ========================================================================
+﻿# ============================================================================
+#  FRAMEWORK PRINCIPAL - API REST
+# ============================================================================
+fastapi==0.136.0              # Framework web moderno para APIs REST (endpoints, validación, Swagger)
+starlette==1.0.0              # Framework ASGI subyacente que FastAPI usa internamente
+uvicorn==0.45.0               # Servidor ASGI para ejecutar la aplicación (uvicorn backend.app.main:app)
+h11==0.16.0                   # Protocolo HTTP de bajo nivel para Uvicorn/Starlette
 
-# --- FastAPI & Web Framework ---
-# Marco web moderno y de alto rendimiento para construir APIs REST
-fastapi==0.110.0              # Framework web async para APIs modernas y documentación automática
+# ============================================================================
+#  BASE DE DATOS Y ORM
+# ============================================================================
+SQLAlchemy==2.0.49            # ORM para BD - Define modelos (User, Subscription, Payment) y consultas SQL
+psycopg2-binary==2.9.11       # Driver PostgreSQL - Conexión nativa con BD PostgreSQL
+alembic==1.13.1               # Sistema de migraciones - Versiona cambios en esquema (database/migrations/)
+greenlet==3.4.0               # Pseudo-threads para pool de conexiones asincrónico en SQLAlchemy
 
-# Servidor ASGI para ejecutar la aplicación FastAPI en producción
-uvicorn==0.27.0               # Servidor web de alta performance para aplicaciones ASGI
+# ============================================================================
+#  VALIDACIÓN DE DATOS Y SERIALIZACIÓN JSON
+# ============================================================================
+pydantic==2.13.3              # Validación y serialización - DTOs (schemas.py), validación automática
+pydantic_core==2.46.3         # Core de Pydantic escrito en Rust - Validación rápida (dependencia de Pydantic)
+annotated-types==0.7.0        # Type hints complejos para Pydantic v2
+annotated-doc==0.0.4          # Documentación de tipos anotados - Swagger automático
+typing-inspection==0.4.2      # Inspección de tipos en tiempo de ejecución
+typing_extensions==4.15.0     # Extensiones de typing (TypedDict, Literal, etc.)
 
-# Middleware para manejar carga de archivos y datos multipart/form-data
-python-multipart==0.0.6       # Permite procesar formularios y carga de archivos en FastAPI
+# ============================================================================
+#  PROCESAMIENTO DE DATOS Y ANÁLISIS
+# ============================================================================
+pandas==3.0.1                 # Análisis de datos (Nota: poco usado, considerar remover si <100k registros)
+numpy==2.4.2                  # Computación numérica (dependencia de Pandas y Scipy)
+scipy==1.17.0                 # Funciones científicas avanzadas - Estadísticas (poco usado actualmente)
 
+# ============================================================================
+#  CONFIGURACIÓN Y VARIABLES DE ENTORNO
+# ============================================================================
+python-dotenv==1.2.2          # Cargar variables .env - Credenciales PostgreSQL sin hardcodear
+click==8.3.3                  # CLI framework - Soporte para comandos de línea (FastAPI CLI)
+colorama==0.4.6               # Colores en terminal - Output mejorado en logs
 
-# --- Database & ORM ---
-# Herramientas para gestión de base de datos PostgreSQL
+# ============================================================================
+#  VALIDACIÓN DE RED Y EMAIL
+# ============================================================================
+email-validator==2.3.0        # Validación de emails - Verifica estructura y dominio
+requests==2.32.5              # HTTP client - Peticiones a APIs externas
+urllib3==2.6.3                # HTTP client de bajo nivel (dependencia de requests)
+dnspython==2.8.0              # Resolver DNS - Validación de dominio en email-validator
+idna==3.12                    # Codificación IDNA - Dominios internacionales (ñ, ü, etc.)
+charset-normalizer==3.4.7     # Detección de charset - Caracteres especiales
+certifi==2026.4.22            # Certificados SSL/TLS - Conexiones HTTPS seguras
+anyio==4.13.0                 # Abstracción asincrónica - Operaciones no bloqueantes
 
-# ORM (Object-Relational Mapping) para interactuar con bases de datos de forma orientada a objetos
-sqlalchemy==2.0.49            # ORM poderoso que abstrae la lógica SQL y permite escribir código más limpio
+# ============================================================================
+#  TESTING Y CALIDAD DE CÓDIGO
+# ============================================================================
+pytest==7.4.4                 # Framework de testing - Ejecutar tests (backend/tests/)
+pytest-cov==4.1.0             # Plugin pytest - Medir cobertura de tests (pytest --cov=backend)
+coverage==7.13.5              # Análisis de cobertura - Qué % del código está testeado
+pluggy==1.6.0                 # Sistema de plugins para pytest
+iniconfig==2.3.0              # Lectura de archivos INI - Configuración de pytest.ini
 
-# Driver para conectar Python con PostgreSQL de forma directa y eficiente
-psycopg2-binary==2.9.11       # Adaptador PostgreSQL para Python, permite conexiones nativas a la BD
+# ============================================================================
+#  DATOS DE PRUEBA Y UTILIDADES
+# ============================================================================
+Faker==40.13.0                # Generación de datos fake - Usuarios/emails ficticios (database/seeders/)
+python-dateutil==2.9.0.post0  # Utilidades de fechas - Parsing y cálculos (canceled_at, started_at)
+pytz==2025.2                  # Zonas horarias - Conversión de timestamps
+tzdata==2026.1                # Base de datos de zonas horarias (dependencia de pytz)
+python-multipart==0.0.6       # Parsing multipart/form-data - Upload de archivos
+six==1.17.0                   # Compatibilidad Python 2/3 (dependencia legacy, considerar remover)
 
-# Herramienta de migraciones de base de datos (control de versiones de esquema)
-alembic==1.13.1               # Versionador de esquemas de BD para gestionar cambios en tablas y estructuras
-
-
-# --- Data Validation & Schemas ---
-# Validación de datos y serialización/deserialización
-
-# Biblioteca de validación de datos con type hints de Python
-pydantic==2.6.3               # Validación robusta de tipos de datos y esquemas de request/response
-
-# Validador especializado para correos electrónicos con formato válido
-email-validator==2.3.0        # Validación avanzada de direcciones de correo electrónico
-
-
-# --- Data Processing & Analytics ---
-# Herramientas para análisis y manipulación de datos
-
-# Biblioteca de análisis de datos para manipular estructuras tabulares
-pandas==3.0.1                 # Manipulación, limpieza y análisis de datos (DataFrames)
-
-# Librería numérica fundamental para cálculos científicos y matriciales
-numpy==2.4.2                  # Array multidimensionales y operaciones numéricas eficientes
-
-# Herramientas avanzadas de análisis estadístico y científico
-scipy==1.17.0                 # Algoritmos científicos: estadística, interpolación, optimización
-
-
-# --- Date/Time & Utilities ---
-# Manejo de zonas horarias y fechas
-
-# Base de datos de zonas horarias IANA
-pytz==2025.2                  # Manejo correcto de zonas horarias en aplicaciones globales
-
-# Utilidades avanzadas para cálculos con fechas relativas
-python-dateutil==2.9.0.post0  # Extensiones para parsing y cálculos de fechas (relativedelta, etc.)
-
-# Cliente HTTP para realizar peticiones a APIs externas
-requests==2.32.5              # Realización de peticiones HTTP simples y confiables
-
-
-# --- Testing & Development ---
-# Herramientas para testing automatizado y generación de datos
-
-# Generador de datos ficticios realistas para testing y desarrollo
-Faker==40.13.0                # Generación de nombres, emails, direcciones y otros datos fake realistas
-
-# Framework de testing para Python con características avanzadas
-pytest==7.4.4                 # Herramienta de testing potente y flexible
-
-# Plugin de pytest para medir cobertura de código en tests
-pytest-cov==4.1.0             # Reportes de cobertura de código (% de líneas testeadas)
-
-
-# ========================================================================
-# INSTALACIÓN:
-# pip install -r requirements.txt
-#
-# PARA DESARROLLO (con herramientas extra):
-# pip install -r requirements.txt
-#
-# DESARROLLO LOCAL:
-# 1. Crear .env con DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/db
-# 2. uvicorn app.main:app --reload  (ejecutar servidor en http://localhost:8000)
-# 3. pytest  (ejecutar tests)
-# ========================================================================
-
+# ============================================================================
+#  DOCUMENTACIÓN Y TEMPLATING
+# ============================================================================
+MarkupSafe==3.0.3             # Escape HTML - Seguridad XSS en Swagger
+Mako==1.3.11                  # Motor de templates - Generación de SQL/reportes (dependencia Alembic)
+Pygments==2.20.0              # Resaltado de sintaxis - Colores en documentación
+packaging==26.1               # Utilidades de empaquetamiento - Gestión de versiones
