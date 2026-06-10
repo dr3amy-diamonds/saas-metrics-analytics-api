@@ -1,203 +1,293 @@
 """
-seed_db.py — Generador de datos realistas para SaaS Analytics Platform
-Senior Data Engineer pattern: cada bloque de datos cuenta una historia de negocio.
+seed_db.py — Generador de datos sintéticos realistas para SaaS Analytics Platform.
+Cada bloque de datos modela un comportamiento de negocio específico e incluye
+simulación de actividad de usuario (user_activity_logs).
 """
 
+import os
 import uuid
 import random
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 
 import psycopg2
 from faker import Faker
 
-# ── Configuración de conexión ─────────────────────────────────────────────────
-DB_CONFIG = {
-    "host":     "localhost",
-    "port":     5432,
-    "dbname":   "your_database",
-    "user":     "your_user",
-    "password": "your_password",
-}
+# *************************************************************************************
+# CARGA DE CONFIGURACIÓN DESDE EL ARCHIVO .ENV
+# *************************************************************************************
 
-fake = Faker("en_US")   # Locale explícito → sin tildes ni ñ que rompan UTF-8
+# Se resuelve la ruta absoluta al .env ubicado en la raíz del proyecto
+base_path = Path(__file__).resolve().parent.parent.parent
+env_path  = base_path / '.env'
+
+if env_path.exists():
+    # Se parsea el archivo línea por línea e inyectan las variables al entorno del proceso
+    with open(env_path, 'r', encoding="cp1252", errors="ignore") as archivo:
+        for linea in archivo:
+            linea = linea.strip()
+            if not linea or linea.startswith("#") or "=" not in linea:
+                continue
+            key, value = linea.split('=', 1)
+            value = value.strip().strip('"').strip("'")
+            os.environ[key] = value
+else:
+    raise FileNotFoundError(f"Error crítico: no se encontró el archivo .env en {env_path}")
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("Error crítico: DATABASE_URL no está definida en el archivo .env.")
+
+# Se limpia el dialecto de SQLAlchemy (+psycopg2) para que psycopg2 nativo pueda interpretarlo
+CLEAN_DB_URL = DATABASE_URL.replace("+psycopg2", "")
+
+# *************************************************************************************
+# CONFIGURACIÓN GLOBAL
+# *************************************************************************************
+
+# Se establece locale explícito para evitar tildes o caracteres especiales que rompan UTF-8
+fake = Faker("en_US")
 NOW  = datetime.now(tz=timezone.utc)
 
-# ── 1. DISTRIBUCIÓN DE FECHAS DE REGISTRO ────────────────────────────────────
-# Usamos random.expovariate para sesgar las fechas hacia el presente:
-# un λ alto produce la mayoría de valores cerca de 0 (= hoy),
-# mientras que los outliers llegan hasta 180 días atrás.
-# Resultado: curva de crecimiento exponencial invertida → pocos al inicio,
-# muchos en los últimos 2 meses.
+# *************************************************************************************
+# MÓDULO 1: DISTRIBUCIÓN DE FECHAS DE REGISTRO
+#*************************************************************************************
+
 def generate_registration_date() -> datetime:
-    WINDOW_DAYS = 180                        # 6 meses de historia
-    LAMBDA      = 0.018                      # controla la "aceleración" del crecimiento
-    days_ago    = min(WINDOW_DAYS, int(random.expovariate(LAMBDA)))
-    jitter_secs = random.randint(0, 86_400)  # hora aleatoria dentro del día
-    return NOW - timedelta(days=days_ago, seconds=jitter_secs)
+    """
+    Se genera una fecha de registro con distribución exponencial para simular
+    el crecimiento orgánico acelerado típico de un SaaS en expansión.
+    """
+    WINDOW_DAYS = 180    # Ventana de historia: 6 meses hacia atrás
+    LAMBDA      = 0.018  # Controla la tasa de aceleración del crecimiento
 
+    # Se truncan los outliers extremos para mantener la coherencia temporal
+    days_ago = min(random.expovariate(LAMBDA), WINDOW_DAYS)
+    return NOW - timedelta(days=days_ago)
 
-# ── 2. DISTRIBUCIÓN DE PLANES (Pareto 70/20/10) ──────────────────────────────
-PLANS = [
-    {"name": "Basic",      "price": 29.00},
-    {"name": "Pro",        "price": 99.00},
-    {"name": "Enterprise", "price": 499.00},
-]
-PLAN_WEIGHTS = [0.70, 0.20, 0.10]   # Pareto: la masa se concentra en el tier base
+# *************************************************************************************
+# MÓDULO 2: MODELADO DE PLANES Y PRECIOS
+# *************************************************************************************
 
-def pick_plan() -> dict:
-    return random.choices(PLANS, weights=PLAN_WEIGHTS, k=1)[0]
+# Se define la distribución de planes según el modelo Pareto:
+# mayoría en Basic (masa), minoría en Enterprise (alto LTV)
+PLANES = {
+    "Basic":      {"price": 29.00,  "prob": 0.70},
+    "Pro":        {"price": 79.00,  "prob": 0.20},
+    "Enterprise": {"price": 249.00, "prob": 0.10},
+}
 
+def pick_plan() -> str:
+    """Se selecciona un plan de forma aleatoria respetando la distribución de probabilidad definida."""
+    r = random.random()
+    if r < 0.70: return "Basic"
+    if r < 0.90: return "Pro"
+    return "Enterprise"
 
-# ── 3. LÓGICA DE CHURN (15 %) ────────────────────────────────────────────────
-CHURN_RATE = 0.15
+# *************************************************************************************
+# MÓDULO 3: SIMULACIÓN DEL CICLO DE VIDA (SUBSCRIPTION STATUS)
+# *************************************************************************************
 
-def build_subscription(user_id: uuid.UUID, reg_date: datetime) -> dict:
-    plan   = pick_plan()
-    sub_id = uuid.uuid4()
+def build_subscription(user_id: str, reg_date: datetime) -> dict:
+    """
+    Se construye la suscripción de un usuario modelando la probabilidad de churn
+    en función de su antigüedad: las cohortes más viejas tienen mayor tasa de cancelación.
+    """
+    plan_name = pick_plan()
+    price     = PLANES[plan_name]["price"]
 
-    # La suscripción empieza el mismo día del registro (flujo de onboarding)
-    started_at  = reg_date
-    is_canceled = random.random() < CHURN_RATE
+    # Se incrementa la tasa de churn para usuarios con más de 90 días en la plataforma
+    days_active    = (NOW - reg_date).days
+    churn_baseline = 0.05
+    if days_active > 90:
+        churn_baseline += 0.10  # Tasa ajustada al 15% para cohortes antiguas
 
-    canceled_at = None
-    status      = "active"
+    is_canceled = random.random() < churn_baseline
 
     if is_canceled:
-        status = "canceled"
-        # Churn lógico: al menos 15 días después de started_at, antes de hoy
-        min_cancel = started_at + timedelta(days=15)
-        if min_cancel < NOW:
-            delta_seconds = int((NOW - min_cancel).total_seconds())
-            canceled_at   = min_cancel + timedelta(seconds=random.randint(0, delta_seconds))
+        # Se calcula una fecha de cancelación aleatoria dentro del periodo activo del usuario
+        duration_days = random.randint(1, max(1, days_active))
+        canceled_at   = reg_date + timedelta(days=duration_days)
+        status        = "canceled"
+    else:
+        status      = "active"
+        canceled_at = None
 
     return {
-        "id":            sub_id,
+        "id":            str(uuid.uuid4()),
         "user_id":       user_id,
-        "plan_name":     plan["name"],
-        "price":         plan["price"],
+        "plan_name":     plan_name,
         "status":        status,
-        "started_at":    started_at,
-        "canceled_at":   canceled_at,
+        "monthly_price": price,
+        "started_at":    reg_date,
+        "canceled_at":   canceled_at
     }
 
-
-# ── 4 & 5. GENERACIÓN DE PAGOS (uno por mes activo + 3 % de fallos) ──────────
-FAILED_RATE = 0.03
+# *************************************************************************************
+# MÓDULO 4: HISTORIAL DE PAGOS (FINANCIAL DATA ENGINE)
+# *************************************************************************************
 
 def build_payments(sub: dict) -> list[dict]:
-    payments   = []
-    start      = sub["started_at"]
-    # El ciclo de pagos termina cuando se cancela o en el mes actual
-    end        = sub["canceled_at"] if sub["canceled_at"] else NOW
+    """
+    Se genera el historial de pagos mensuales de una suscripción.
+    Se introduce un 3% de probabilidad de fallo para simular datos financieros sucios.
+    """
+    payments    = []
+    start_dt    = sub["started_at"]
+    end_dt      = sub["canceled_at"] if sub["status"] == "canceled" else NOW
+    current_pay = start_dt
 
-    billing_date = start
-    while billing_date <= end:
-        # 3 % de probabilidad de pago fallido → pérdida de ingreso analizable
-        status = "failed" if random.random() < FAILED_RATE else "success"
+    while current_pay <= end_dt:
+        # Se simula un fallo de tarjeta con probabilidad del 3%
+        pay_status = "success" if random.random() > 0.03 else "failed"
 
         payments.append({
-            "id":              uuid.uuid4(),
+            "id":              str(uuid.uuid4()),
             "subscription_id": sub["id"],
-            "amount":          sub["price"],
-            "status":          status,
-            "processed_at":    billing_date,
+            "amount":          sub["monthly_price"] if pay_status == "success" else 0.00,
+            "status":          pay_status,
+            "processed_at":    current_pay
         })
-        billing_date = billing_date + relativedelta(months=1)
+
+        # Se avanza al siguiente ciclo de facturación mensual
+        current_pay += relativedelta(months=1)
 
     return payments
 
+# *************************************************************************************
+# MÓDULO 5: QUERIES DE INSERCIÓN (BULK PATTERN)
+# *************************************************************************************
 
-# ── INSERCIÓN EN BASE DE DATOS ───────────────────────────────────────────────
 INSERT_USER = """
     INSERT INTO core.users (id, email, full_name, registration_date)
-    VALUES (%s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s);
 """
-
 INSERT_SUB = """
-    INSERT INTO core.subscriptions
-        (id, user_id, plan_name, status, monthly_price, started_at, canceled_at)
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    INSERT INTO core.subscriptions (id, user_id, plan_name, status, monthly_price, started_at, canceled_at)
+    VALUES (%s, %s, %s, %s, %s, %s, %s);
 """
-
 INSERT_PAY = """
     INSERT INTO core.payments (id, subscription_id, amount, status, processed_at)
-    VALUES (%s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s);
+"""
+INSERT_LOG = """
+    INSERT INTO core.user_activity_logs (id, user_id, event_type, event_date)
+    VALUES (%s, %s, %s, %s);
 """
 
-def run_seed(n_users: int = 50) -> None:
+# *************************************************************************************
+# MÓDULO 6: EJECUCIÓN DEL SEEDER
+# *************************************************************************************
+
+def run_seed(n_users: int = 100):
     conn   = None
     cursor = None
+
     try:
-        conn   = psycopg2.connect(**DB_CONFIG)
-        conn.set_client_encoding("UTF8")   # Negocia UTF-8 explícitamente con el servidor
+        print(f"Iniciando generación de datos sintéticos para {n_users} usuarios...")
+
+        # Se establece la conexión a PostgreSQL usando la URL limpia del .env
+        conn   = psycopg2.connect(CLEAN_DB_URL)
         cursor = conn.cursor()
 
-        total_payments = 0
+        # Se truncan todas las tablas del schema para evitar colisiones de clave primaria
+        print("Limpiando registros previos en el schema core...")
+        cursor.execute("TRUNCATE core.user_activity_logs, core.payments, core.subscriptions, core.users CASCADE;")
+
+        # Se generan emails únicos usando el generador de Faker para evitar duplicados
+        emails = set()
+        while len(emails) < n_users:
+            emails.add(fake.unique.email())
+        emails = list(emails)
+
         canceled_count = 0
+        total_payments = 0
+        total_logs     = 0
 
-        for i in range(n_users):
-            # ── Usuario ──────────────────────────────────────────────────────
-            user_id   = uuid.uuid4()
-            reg_date  = generate_registration_date()
-            email     = fake.unique.email()
-            full_name = fake.name()
+        for i, email in enumerate(emails):
+            user_id  = str(uuid.uuid4())
+            name     = fake.name()
+            reg_date = generate_registration_date()
 
-            cursor.execute(INSERT_USER, (user_id, email, full_name, reg_date))
+            # ── 1. Se inserta el usuario base ──
+            cursor.execute(INSERT_USER, (user_id, email, name, reg_date))
 
-            # ── Suscripción ──────────────────────────────────────────────────
+            # ── 2. Se construye e inserta la suscripción con su ciclo de vida simulado ──
             sub = build_subscription(user_id, reg_date)
             cursor.execute(INSERT_SUB, (
-                sub["id"],
-                sub["user_id"],
-                sub["plan_name"],
-                sub["status"],
-                sub["price"],
-                sub["started_at"],
-                sub["canceled_at"],
+                sub["id"], sub["user_id"], sub["plan_name"],
+                sub["status"], sub["monthly_price"],
+                sub["started_at"], sub["canceled_at"]
             ))
 
             if sub["status"] == "canceled":
                 canceled_count += 1
 
-            # ── Pagos ────────────────────────────────────────────────────────
+            # ── 3. Se genera e inserta el historial de pagos mensuales ──
             payments = build_payments(sub)
             for pay in payments:
                 cursor.execute(INSERT_PAY, (
-                    pay["id"],
-                    pay["subscription_id"],
-                    pay["amount"],
-                    pay["status"],
-                    pay["processed_at"],
+                    pay["id"], pay["subscription_id"],
+                    pay["amount"], pay["status"], pay["processed_at"]
                 ))
             total_payments += len(payments)
 
-            print(f"  [{i+1:>3}/{n_users}] user={email[:30]:<30} "
+            # ── 4. Se simulan los eventos de actividad del usuario ──
+            n_logs         = 0
+            total_days_active = 0
+
+            if reg_date < NOW:
+                # Se modela inactividad repentina: el 10% de usuarios activos
+                # no registra eventos en los últimos 20 días
+                is_inactive_user  = random.random() < 0.10 and sub["status"] == "active"
+                end_activity_date = NOW - timedelta(days=20) if is_inactive_user else NOW
+
+                n_logs            = random.randint(5, 30)
+                total_days_active = (end_activity_date - reg_date).days
+
+                if total_days_active > 0:
+                    for _ in range(n_logs):
+                        # Se distribuyen los eventos uniformemente a lo largo del periodo activo
+                        log_date   = reg_date + timedelta(days=random.randint(0, total_days_active))
+                        event_type = random.choice(['login', 'click_dashboard', 'export_data', 'view_report'])
+
+                        cursor.execute(INSERT_LOG, (
+                            str(uuid.uuid4()),
+                            user_id,
+                            event_type,
+                            log_date
+                        ))
+                    total_logs += n_logs
+
+            print(f"  [{i+1:>3}/{n_users}] email={email[:28]:<28} "
                   f"plan={sub['plan_name']:<10} "
                   f"status={sub['status']:<8} "
-                  f"payments={len(payments)}")
+                  f"pagos={len(payments):<3} "
+                  f"logs={n_logs if total_days_active > 0 else 0}")
 
         conn.commit()
-        print("\n✅ Seed completado:")
-        print(f"   • Usuarios:       {n_users}")
-        print(f"   • Cancelaciones:  {canceled_count}  ({canceled_count/n_users:.0%} churn)")
-        print(f"   • Pagos totales:  {total_payments}")
+
+        print("\n" + "=" * 55)
+        print("  RESUMEN DE GENERACIÓN DE DATOS — COMPLETADO")
+        print("=" * 55)
+        print(f"  Usuarios generados          : {n_users}")
+        print(f"  Cancelaciones (churn)       : {canceled_count} ({canceled_count/n_users:.1%})")
+        print(f"  Pagos registrados           : {total_payments}")
+        print(f"  Eventos de actividad (logs) : {total_logs}")
+        print("=" * 55 + "\n")
 
     except psycopg2.Error as e:
-        print(f"\n❌ Error de base de datos: {e}")
-        if conn:
-            conn.rollback()
+        print(f"Error crítico de base de datos: {e}")
+        if conn: conn.rollback()
     except Exception as e:
-        print(f"\n❌ Error inesperado: {e}")
-        if conn:
-            conn.rollback()
+        print(f"Error inesperado durante la ejecución del seeder: {e}")
+        if conn: conn.rollback()
     finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-        print("   Conexión cerrada.")
+        if cursor: cursor.close()
+        if conn:   conn.close()
 
 
+# Se define este bloque como punto de entrada para ejecución directa desde consola
 if __name__ == "__main__":
-    run_seed(n_users=50)
+    run_seed(n_users=100)

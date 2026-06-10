@@ -35,3 +35,11 @@ class Payment(Base):
     amount = Column(Numeric, nullable=False)
     status = Column(String, nullable=False)
     processed_at = Column(DateTime, nullable=False)
+
+class UserActivityLog(Base):
+    __tablename__ = "user_activity_logs"
+    __tablename___args__ = {"schema": "core"}
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('core.users.id'), nullable=False)
+    event_type = Column(String, nullable=False)
+    event_date = Column(DateTime, nullable=False)

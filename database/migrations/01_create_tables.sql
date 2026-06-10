@@ -58,6 +58,17 @@ CREATE TABLE payments(
 		FOREIGN KEY(subscription_id) REFERENCES subscriptions(id)
 );
 
+-- 4. Tabla de Logs de Actividad
+CREATE TABLE user_activity_logs (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid REFERENCES core.users(id) NOT NULL,
+    event_type text NOT NULL,
+    event_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índice para optimizar consultas rápidas
+CREATE INDEX idx_activity_user_date ON user_activity_logs(user_id, event_date DESC);
+
 -- Esta tabla es para almacenar eventos relacionados con las suscripciones, como actualizaciones de plan, renovaciones, etc.
 -- Paso 4: Crear el "Contenedor" (CTE)
 WITH mrr_data AS (

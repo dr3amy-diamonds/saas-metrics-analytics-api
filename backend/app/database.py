@@ -12,9 +12,9 @@ env_path = base_path / '.env'
 
 # --- PASO 2 y 3: PARSER E INYECCIÓN (Todo junto en el bucle) ---
 if env_path.exists():
-    with open(env_path, 'r', encoding="utf-8") as archivo:
+    with open(env_path, 'r', encoding="cp1252", errors="ignore") as archivo:
         for linea in archivo:
-            linea = linea.strip() # Elimina espacio extra al principio y al final de la linea
+            linea = linea.strip()# Elimina espacio extra al principio y al final de la linea
 
             # Filtros de seguridad
             if not linea or linea.startswith("#") or "=" not in linea: # Ignora líneas vacías, comentarios y líneas sin '='

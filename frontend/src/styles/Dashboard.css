@@ -1,0 +1,103 @@
+/* Contenedor principal del Dashboard */
+.dashboard-container {
+  padding: 2.5rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Título Corporativo */
+.dashboard-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a; /* Azul pizarra oscuro profundo */
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+/* Rejilla de métricas: Forzada a 2 columnas iguales */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  width: 100%;
+}
+
+/* Tarjetas Estilo SaaS Profesional */
+.card-enterprise {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+/* Textos internos de las tarjetas */
+.metric-label {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 0 0.25rem 0;
+}
+
+.metric-value {
+  color: #0f172a;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Contenedor de la Tabla */
+.table-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+/* Tabla de Datos Analíticos */
+.table-enterprise {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table-enterprise th {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table-enterprise td {
+  padding: 1rem 1.5rem;
+  color: #334155;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Fila interactiva */
+.table-enterprise tbody tr:hover {
+  background-color: #f8fafc;
+  transition: background-color 0.15s ease;
+}
+
+/* Badge de alerta de inactividad */
+.badge-danger {
+  background-color: #fef2f2;
+  color: #991b1b;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
