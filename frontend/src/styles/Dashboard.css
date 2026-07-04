@@ -1,103 +1,400 @@
-/* Contenedor principal del Dashboard */
-.dashboard-container {
+/* ==========================================================================
+   ESTILOS CORPORATIVOS - PLATAFORMA DE ANALÍTICA SAAS v3.0
+   Sincronizado completamente con DashboardCentral.jsx en Español
+   ========================================================================== */
+
+.contenedor-dashboard {
   padding: 2.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
   box-sizing: border-box;
   width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Título Corporativo */
-.dashboard-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #0f172a; /* Azul pizarra oscuro profundo */
-  margin-bottom: 2rem;
-  text-align: left;
-}
-
-/* Rejilla de métricas: Forzada a 2 columnas iguales */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+/* Encabezado Principal */
+.encabezado-dashboard {
   margin-bottom: 2.5rem;
-  width: 100%;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1.5rem;
 }
 
-/* Tarjetas Estilo SaaS Profesional */
-.card-enterprise {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-/* Textos internos de las tarjetas */
-.metric-label {
-  color: #64748b;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin: 0 0 0.25rem 0;
-}
-
-.metric-value {
-  color: #0f172a;
-  font-size: 1.75rem;
+.titulo-dashboard {
+  font-size: 2rem;
   font-weight: 700;
+  color: #0f172a; /* Pizarra 900 */
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.025em;
+}
+
+.subtitulo-dashboard {
+  font-size: 0.95rem;
+  color: #64748b; /* Pizarra 500 */
   margin: 0;
 }
 
-/* Contenedor de la Tabla */
-.table-container {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+/* Rejilla de Indicadores Clave (KPIs) */
+.rejilla-metricas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
   width: 100%;
 }
 
-/* Tabla de Datos Analíticos */
-.table-enterprise {
+.tarjeta-corporativa {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-corporativa:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+}
+
+.envoltorio-icono {
+  padding: 1rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.envoltorio-icono.alerta {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.envoltorio-icono.dolar {
+  background-color: #f0fdf4;
+  color: #22c55e;
+}
+
+.etiqueta-metrica {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.valor-metrica {
+  color: #0f172a;
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* Sección de la Tabla Analítica */
+.seccion-tabla {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.acciones-encabezado-tabla {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding: 0 0.25rem;
+}
+
+.subtitulo-seccion {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.contador-filas {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.contenedor-tabla {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+}
+
+.tabla-corporativa {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  font-size: 0.925rem;
 }
 
-.table-enterprise th {
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.table-enterprise td {
-  padding: 1rem 1.5rem;
-  color: #334155;
-  font-size: 0.875rem;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-/* Fila interactiva */
-.table-enterprise tbody tr:hover {
+.tabla-corporativa th {
   background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.tabla-corporativa td {
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.fila-tabla-interactiva:hover {
+  background-color: #f8fafc;
+}
+
+/* Estructura de Celdas */
+.celda-informacion-cliente {
+  display: flex;
+  flex-direction: column;
+}
+
+.nombre-cliente {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.correo-cliente {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+}
+
+.celda-plan {
+  font-weight: 500;
+  color: #334155;
+}
+
+.celda-actividad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ultima-conexion {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Etiquetas de Arquetipos (Mapeadas por las claves del Backend) */
+.etiqueta-arquetipo {
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-block;
+  letter-spacing: 0.025em;
+  text-align: center;
+}
+
+/* Cuando el backend envía 'power_user' */
+.etiqueta-arquetipo.power_user {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  border: 1px solid #fca5a5;
+}
+
+/* Cuando el backend envía 'casual_user' */
+.etiqueta-arquetipo.casual_user {
+  background-color: #e0e7ff !important;
+  color: #3730a3 !important;
+  border: 1px solid #c7d2fe;
+}
+
+/* Cuando el backend envía 'zombie_user' */
+.etiqueta-arquetipo.zombie_user {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1;
+}
+
+/* Cuando el backend envía 'churned_risk' */
+.etiqueta-arquetipo.churned_risk {
+  background-color: #ffedd5 !important;
+  color: #9a3412 !important;
+  border: 1px solid #fdba74;
+}
+
+
+/* Estados de Gestión Preventiva (Vienen como clase_css_gestion desde FastAPI) */
+.etiqueta-gestionado {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
+}
+
+/* Cuando ya se envió el correo ('sent') */
+.etiqueta-gestionado.sent {
+  background-color: #f0f9ff !important;
+  color: #0369a1 !important;
+  border: 1px solid #bae6fd;
+}
+
+/* Cuando ya se contactó al cliente ('contacted') */
+.etiqueta-gestionado.contacted {
+  background-color: #fdfaeb !important;
+  color: #b45309 !important;
+  border: 1px solid #fef3c7;
+}
+
+/* Cuando se solucionó el riesgo ('resolved') */
+.etiqueta-gestionado.resolved {
+  background-color: #f0fdf4 !important;
+  color: #166534 !important;
+  border: 1px solid #bbf7d0;
+}
+
+/* Cuando el cliente no contestó ('no_response') */
+.etiqueta-gestionado.no_response {
+  background-color: #fafafa !important;
+  color: #737373 !important;
+  border: 1px solid #e5e5e5;
+}
+
+/* Botón Operativo */
+.boton-disparador-accion {
+  background-color: #0f172a;
+  color: #ffffff;
+  border: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.825rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
   transition: background-color 0.15s ease;
 }
 
-/* Badge de alerta de inactividad */
-.badge-danger {
-  background-color: #fef2f2;
-  color: #991b1b;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
+.boton-disparador-accion:hover {
+  background-color: #1e293b;
+}
+
+/* ==========================================================================
+   SISTEMA DE PAGINACIÓN COMPACTO
+   ========================================================================== */
+
+.contenedor-paginacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.boton-paginacion {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.boton-paginacion:hover:not(:disabled) {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.boton-paginacion:disabled {
+  color: #cbd5e1;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.pastillas-indicadoras-pagina {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pastilla-pagina {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  transition: all 0.15s ease;
+}
+
+.pastilla-pagina:hover:not(.activa) {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.pastilla-pagina.activa {
+  background-color: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
   font-weight: 600;
-  display: inline-block;
+}
+
+.puntos-suspensivos-pagina {
+  color: #94a3b8;
+  padding: 0 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* ==========================================================================
+   PANTALLA DE CARGA (SPINNER)
+   ========================================================================== */
+
+.contenedor-carga {
+  padding: 5rem;
+  text-align: center;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.rueda-carga {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0f172a;
+  border-radius: 50%;
+  animation: girar 1s linear infinite;
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
 }
