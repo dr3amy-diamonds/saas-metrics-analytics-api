@@ -3,8 +3,6 @@ import axios from 'axios';
 import { AlertTriangle, DollarSign, ChevronLeft, ChevronRight, UserCheck, Mail } from 'lucide-react';
 import '../styles/Dashboard.css';
 
-// ─── IMPORTACIÓN DEL NUEVO COMPONENTE DE GRÁFICOS ───
-import MRRTendencia from './MRRTendencia';
 
 const DashboardCentral = () => {
   const [datos, setDatos] = useState(null);
@@ -106,8 +104,6 @@ const DashboardCentral = () => {
         </div>
       </div>
 
-      {/* ─── COMPONENTE DE LA GRÁFICA DE TENDENCIA DE MRR ─── */}
-      <MRRTendencia />
 
       {/* Sección de la Tabla Analítica */}
       <div className="seccion-tabla">

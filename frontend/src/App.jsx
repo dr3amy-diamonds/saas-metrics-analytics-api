@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { LayoutDashboard, Users, Settings, Activity } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, Activity, ShieldAlert } from 'lucide-react';
 import DashboardCentral from './components/DashboardCentral';
+import MetricsDashboard from './components/MetricsDashboard';
 
 function App() {
   return (
@@ -11,7 +12,7 @@ function App() {
         {/* SIDEBAR FIJO A LA IZQUIERDA */}
         <nav style={{
           width: '260px',
-          minWidth: '260px', /* Evita que el menú se encoja */
+          minWidth: '260px',
           backgroundColor: '#ffffff',
           borderRight: '1px solid #e2e8f0',
           padding: '2rem 1.5rem',
@@ -19,13 +20,18 @@ function App() {
           flexDirection: 'column'
         }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '2.5rem', color: '#0f172a', fontFamily: 'sans-serif' }}>
-            SaaS Analytics
+            NimbusDocs
           </h2>
 
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <li>
               <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: '#0f172a', textDecoration: 'none', fontWeight: '600', fontFamily: 'sans-serif', backgroundColor: '#f1f5f9' }}>
-                <LayoutDashboard size={18} /> Dashboard
+                <LayoutDashboard size={18} /> Analytics
+              </Link>
+            </li>
+            <li>
+              <Link to="/mitigacion" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '8px', color: '#475569', textDecoration: 'none', fontWeight: '500', fontFamily: 'sans-serif' }}>
+                <ShieldAlert size={18} /> Mitigación
               </Link>
             </li>
             <li>
@@ -49,7 +55,8 @@ function App() {
         {/* CONTENIDO CENTRAL INDEPENDIENTE A LA DERECHA */}
         <main style={{ flex: 1, height: '100vh', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
           <Routes>
-            <Route path="/" element={<DashboardCentral />} />
+            <Route path="/" element={<MetricsDashboard />} />
+            <Route path="/mitigacion" element={<DashboardCentral />} />
             <Route path="/users" element={<div style={{ padding: '2.5rem', color: '#64748b' }}>Módulo de Usuarios en construcción...</div>} />
           </Routes>
         </main>
