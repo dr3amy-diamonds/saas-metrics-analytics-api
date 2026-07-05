@@ -1,0 +1,99 @@
+/* LTV Cards - Cards de LTV por Plan */
+
+.ltv-cards-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.ltv-card {
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ltv-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.ltv-badge {
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.ltv-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ltv-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ltv-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ltv-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid;
+  border-color: inherit;
+  margin-top: 0.5rem;
+}
+
+.ltv-label-main {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ltv-value-main {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.ltv-nota {
+  font-size: 0.75rem;
+  font-style: italic;
+  padding-top: 0.5rem;
+  border-top: 1px solid;
+  border-color: inherit;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .ltv-cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .ltv-cards-container {
+    grid-template-columns: 1fr;
+  }
+}
+

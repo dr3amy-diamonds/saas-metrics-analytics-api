@@ -1,0 +1,25 @@
+/* Churn por Plan - Gráfica de Líneas Múltiples */
+
+.churn-por-plan-card {
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.churn-por-plan-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.churn-por-plan-card h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: -0.005em;
+}
+
+.recharts-legend {
+  padding-top: 1rem;
+}
+
