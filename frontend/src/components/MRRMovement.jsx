@@ -33,7 +33,7 @@ const MRRMovement = ({ darkMode }) => {
             datosMap[mesFormateado] = { mes: mesFormateado };
           }
 
-          datosMap[mesFormateado][item.categoria] = parseFloat(item.cambio_neto_mrr);
+          datosMap[mesFormateado][item.categoria] = Number.parseFloat(item.cambio_neto_mrr);
         });
 
         const datosPivoteados = Object.values(datosMap);
@@ -47,54 +47,40 @@ const MRRMovement = ({ darkMode }) => {
       });
   }, []);
 
-  const bgColor = darkMode ? '#1e293b' : '#ffffff';
-  const textPrimary = darkMode ? '#f1f5f9' : '#0f172a';
-  const textSecondary = darkMode ? '#94a3b8' : '#64748b';
-  const borderColor = darkMode ? '#334155' : '#e2e8f0';
-  const gridColor = darkMode ? '#334155' : '#e2e8f0';
-
-  const colors = {
-    'Nuevo': '#22c55e',
-    'Cancelación': '#ef4444',
-    'Expansión': '#3b82f6',
-    'Contracción': '#f97316',
-    'Sin Cambio': '#94a3b8'
-  };
-
   if (loading) {
     return (
-      <div className="mrr-movement-card" style={{ backgroundColor: bgColor, borderColor }}>
-        <h3 style={{ color: textPrimary }}>Movimiento de MRR</h3>
-        <div style={{ padding: '2rem', textAlign: 'center', color: textSecondary }}>Cargando datos...</div>
+      <div className={darkMode ? 'mrr-movement-card card-dark' : 'mrr-movement-card card-light'}>
+        <h3 className={darkMode ? 'titulo-grafica texto-dark' : 'titulo-grafica texto-light'}>Movimiento de MRR</h3>
+        <div className={darkMode ? 'estado-carga cargando-dark' : 'estado-carga cargando-light'}>Cargando datos...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mrr-movement-card" style={{ backgroundColor: bgColor, borderColor }}>
-        <h3 style={{ color: textPrimary }}>Movimiento de MRR</h3>
-        <div style={{ padding: '2rem', color: '#dc2626' }}>No se pudieron cargar los datos</div>
+      <div className={darkMode ? 'mrr-movement-card card-dark' : 'mrr-movement-card card-light'}>
+        <h3 className={darkMode ? 'titulo-grafica texto-dark' : 'titulo-grafica texto-light'}>Movimiento de MRR</h3>
+        <div className="estado-error error-carga">No se pudieron cargar los datos</div>
       </div>
     );
   }
 
   return (
-    <div className="mrr-movement-card" style={{ backgroundColor: bgColor, border: `1px solid ${borderColor}` }}>
-      <h3 style={{ color: textPrimary }}>Movimiento de MRR</h3>
+    <div className={darkMode ? 'mrr-movement-card card-dark' : 'mrr-movement-card card-light'}>
+      <h3 className={darkMode ? 'titulo-grafica texto-dark' : 'titulo-grafica texto-light'}>Movimiento de MRR</h3>
 
       <ResponsiveContainer width="100%" height={320}>
         <BarChart data={datos}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? '#334155' : '#e2e8f0'} />
           <XAxis
             dataKey="mes"
-            stroke={textSecondary}
+            stroke={darkMode ? '#94a3b8' : '#64748b'}
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            stroke={textSecondary}
+            stroke={darkMode ? '#94a3b8' : '#64748b'}
             fontSize={12}
             tickLine={false}
             axisLine={false}
@@ -105,20 +91,17 @@ const MRRMovement = ({ darkMode }) => {
             contentStyle={{
               borderRadius: '8px',
               backgroundColor: darkMode ? '#334155' : '#ffffff',
-              border: `1px solid ${borderColor}`,
+              border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
               boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-              color: textPrimary
+              color: darkMode ? '#f1f5f9' : '#0f172a'
             }}
           />
-          <Legend
-            wrapperStyle={{ paddingTop: '1rem' }}
-            iconType="square"
-          />
-          <Bar dataKey="Nuevo" stackId="a" fill={colors['Nuevo']} />
-          <Bar dataKey="Cancelación" stackId="a" fill={colors['Cancelación']} />
-          <Bar dataKey="Expansión" stackId="a" fill={colors['Expansión']} />
-          <Bar dataKey="Contracción" stackId="a" fill={colors['Contracción']} />
-          <Bar dataKey="Sin Cambio" stackId="a" fill={colors['Sin Cambio']} />
+          <Legend iconType="square" />
+          <Bar dataKey="Nuevo" stackId="a" fill="#22c55e" />
+          <Bar dataKey="Cancelación" stackId="a" fill="#ef4444" />
+          <Bar dataKey="Expansión" stackId="a" fill="#3b82f6" />
+          <Bar dataKey="Contracción" stackId="a" fill="#f97316" />
+          <Bar dataKey="Sin Cambio" stackId="a" fill="#94a3b8" />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -21,7 +21,7 @@ const LTVCards = ({ darkMode }) => {
   }, []);
 
   const formatearUSD = (cantidad) => {
-    return new Intl.NumberFormat('es-ES', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
@@ -30,11 +30,10 @@ const LTVCards = ({ darkMode }) => {
   };
 
   const formatearPorcentaje = (valor) => {
-    return (parseFloat(valor) * 100).toFixed(2) + '%';
+    return parseFloat(valor).toFixed(2) + '%';
   };
 
   const bgColor = darkMode ? '#1e293b' : '#ffffff';
-  const bgCardColor = darkMode ? '#0f172a' : '#f8fafc';
   const textPrimary = darkMode ? '#f1f5f9' : '#0f172a';
   const textSecondary = darkMode ? '#94a3b8' : '#64748b';
   const borderColor = darkMode ? '#334155' : '#e2e8f0';
@@ -46,7 +45,7 @@ const LTVCards = ({ darkMode }) => {
   };
 
   if (loading) {
-    return <div style={{ padding: '2rem', color: darkMode ? '#94a3b8' : '#94a3b8', textAlign: 'center' }}>Cargando LTV...</div>;
+    return <div style={{ padding: '2rem', color: darkMode ? '#94a3b8' : '#64748b', textAlign: 'center' }}>Cargando LTV...</div>;
   }
 
   if (error) {
@@ -110,4 +109,3 @@ const LTVCards = ({ darkMode }) => {
 };
 
 export default LTVCards;
-

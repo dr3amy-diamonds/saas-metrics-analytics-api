@@ -21,7 +21,7 @@ const ChurnTendencia = ({ darkMode }) => {
       .then(res => {
         const datosFormateados = res.data.map(item => ({
           ...item,
-          churn_rate: parseFloat(item.churn_rate) * 100,
+          churn_rate: parseFloat(item.churn_rate),
           mes_formateado: new Date(item.mes).toLocaleDateString('es-ES', {
             month: 'short',
             year: '2-digit'
@@ -107,4 +107,3 @@ const ChurnTendencia = ({ darkMode }) => {
 };
 
 export default ChurnTendencia;
-

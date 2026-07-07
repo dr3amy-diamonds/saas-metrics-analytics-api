@@ -11,37 +11,20 @@ import '../styles/MetricsDashboard.css';
 const MetricsDashboard = () => {
   const [darkMode, setDarkMode] = useState(false);
 
-  const bgPrimary = darkMode ? '#0f172a' : '#f8fafc';
-  const bgSecondary = darkMode ? '#1e293b' : '#ffffff';
-  const textPrimary = darkMode ? '#f1f5f9' : '#0f172a';
-  const textSecondary = darkMode ? '#94a3b8' : '#64748b';
-  const borderColor = darkMode ? '#334155' : '#e2e8f0';
-
   return (
-    <div className="metrics-dashboard" style={{ backgroundColor: bgPrimary }}>
+    <div className={darkMode ? 'metrics-dashboard dashboard-dark' : 'metrics-dashboard dashboard-light'}>
       {/* Header */}
-      <div className="dashboard-header" style={{ backgroundColor: bgSecondary, borderBottom: `1px solid ${borderColor}` }}>
+      <div className={darkMode ? 'dashboard-header header-dark' : 'dashboard-header header-light'}>
         <div className="header-content">
           <div>
-            <h1 className="dashboard-title" style={{ color: textPrimary }}>Analytics</h1>
-            <p className="dashboard-subtitle" style={{ color: textSecondary }}>
+            <h1 className={darkMode ? 'dashboard-title texto-dark' : 'dashboard-title texto-light'}>Analytics</h1>
+            <p className={darkMode ? 'dashboard-subtitle texto-secundario-dark' : 'dashboard-subtitle texto-secundario-light'}>
               NimbusDocs · Vista ejecutiva de métricas SaaS
             </p>
           </div>
           <button
-            className="dark-mode-toggle"
+            className={darkMode ? 'dark-mode-toggle toggle-dark' : 'dark-mode-toggle toggle-light'}
             onClick={() => setDarkMode(!darkMode)}
-            style={{
-              backgroundColor: darkMode ? '#334155' : '#e2e8f0',
-              color: darkMode ? '#fbbf24' : '#f59e0b',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '0.5rem 0.75rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}
           >
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
@@ -77,7 +60,7 @@ const MetricsDashboard = () => {
 
         {/* Fila 4: LTV Cards */}
         <section className="dashboard-section">
-          <h2 style={{ color: textPrimary, marginBottom: '1.5rem', fontSize: '1.125rem', fontWeight: '600' }}>
+          <h2 className={darkMode ? 'ltv-section-title texto-dark' : 'ltv-section-title texto-light'}>
             LTV por Plan
           </h2>
           <LTVCards darkMode={darkMode} />

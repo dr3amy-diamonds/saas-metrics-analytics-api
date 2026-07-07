@@ -21,7 +21,7 @@ const MRRTendencia = ({ darkMode }) => {
       .then(res => {
         const datosFormateados = res.data.map(item => ({
           ...item,
-          mrr_total: parseFloat(item.mrr_total),
+          mrr_total: Number.parseFloat(item.mrr_total),
           mes_formateado: new Date(item.mes).toLocaleDateString('es-ES', {
             month: 'short',
             year: '2-digit'
@@ -37,46 +37,40 @@ const MRRTendencia = ({ darkMode }) => {
       });
   }, []);
 
-  const bgColor = darkMode ? '#1e293b' : '#ffffff';
-  const textPrimary = darkMode ? '#f1f5f9' : '#0f172a';
-  const textSecondary = darkMode ? '#94a3b8' : '#64748b';
-  const borderColor = darkMode ? '#334155' : '#e2e8f0';
-  const gridColor = darkMode ? '#334155' : '#e2e8f0';
-
   if (loading) {
     return (
-      <div className="mrr-tendencia-card" style={{ backgroundColor: bgColor, borderColor }}>
-        <h3 style={{ color: textPrimary }}>Tendencia de MRR</h3>
-        <div style={{ padding: '2rem', textAlign: 'center', color: textSecondary }}>Cargando datos...</div>
+      <div className={darkMode ? 'mrr-tendencia-card card-dark' : 'mrr-tendencia-card card-light'}>
+        <h3 className={darkMode ? 'titulo-grafica texto-dark' : 'titulo-grafica texto-light'}>Tendencia de MRR</h3>
+        <div className={darkMode ? 'estado-carga cargando-dark' : 'estado-carga cargando-light'}>Cargando datos...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mrr-tendencia-card" style={{ backgroundColor: bgColor, borderColor }}>
-        <h3 style={{ color: textPrimary }}>Tendencia de MRR</h3>
-        <div style={{ padding: '2rem', color: '#dc2626' }}>No se pudieron cargar los datos</div>
+      <div className={darkMode ? 'mrr-tendencia-card card-dark' : 'mrr-tendencia-card card-light'}>
+        <h3 className={darkMode ? 'titulo-grafica texto-dark' : 'titulo-grafica texto-light'}>Tendencia de MRR</h3>
+        <div className="estado-error error-carga">No se pudieron cargar los datos</div>
       </div>
     );
   }
 
   return (
-    <div className="mrr-tendencia-card" style={{ backgroundColor: bgColor, borderColor, border: `1px solid ${borderColor}` }}>
-      <h3 style={{ color: textPrimary }}>Tendencia de MRR</h3>
+    <div className={darkMode ? 'mrr-tendencia-card card-dark' : 'mrr-tendencia-card card-light'}>
+      <h3 className={darkMode ? 'titulo-grafica texto-dark' : 'titulo-grafica texto-light'}>Tendencia de MRR</h3>
 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={datos}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? '#334155' : '#e2e8f0'} />
           <XAxis
             dataKey="mes_formateado"
-            stroke={textSecondary}
+            stroke={darkMode ? '#94a3b8' : '#64748b'}
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            stroke={textSecondary}
+            stroke={darkMode ? '#94a3b8' : '#64748b'}
             fontSize={12}
             tickLine={false}
             axisLine={false}
@@ -87,9 +81,9 @@ const MRRTendencia = ({ darkMode }) => {
             contentStyle={{
               borderRadius: '8px',
               backgroundColor: darkMode ? '#334155' : '#ffffff',
-              border: `1px solid ${borderColor}`,
+              border: `1px solid ${darkMode ? '#334155' : '#e2e8f0'}`,
               boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-              color: textPrimary
+              color: darkMode ? '#f1f5f9' : '#0f172a'
             }}
           />
           <Line

@@ -33,7 +33,7 @@ const ChurnPorPlan = ({ darkMode }) => {
             datosMap[mesFormateado] = { mes: mesFormateado };
           }
 
-          datosMap[mesFormateado][item.plan_name] = parseFloat(item.churn_rate) * 100;
+          datosMap[mesFormateado][item.plan_name] = parseFloat(item.churn_rate);
         });
 
         const datosPivoteados = Object.values(datosMap);
@@ -142,4 +142,3 @@ const ChurnPorPlan = ({ darkMode }) => {
 };
 
 export default ChurnPorPlan;
-

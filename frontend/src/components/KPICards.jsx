@@ -30,12 +30,11 @@ const KPICards = ({ darkMode }) => {
         setLoading(false);
       }
     };
-
     cargarDatos();
   }, []);
 
   const formatearUSD = (cantidad) => {
-    return new Intl.NumberFormat('es-ES', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
@@ -44,69 +43,57 @@ const KPICards = ({ darkMode }) => {
   };
 
   const formatearPorcentaje = (valor) => {
-    return (parseFloat(valor) * 100).toFixed(2) + '%';
+    return parseFloat(valor).toFixed(2) + '%';
+  };
+
+  const getChurnColor = (valor) => {
+    if (valor > 10) return '#dc2626';
+    if (valor > 5) return '#f59e0b';
+    return '#22c55e';
   };
 
   if (loading) {
-    return <div className="skeleton-kpi-loader" style={{ color: darkMode ? '#94a3b8' : '#94a3b8' }}>Cargando KPIs...</div>;
+    return <div style={{ padding: '2rem', textAlign: 'center', color: darkMode ? '#94a3b8' : '#64748b' }}>Cargando KPIs...</div>;
   }
 
   if (error) {
-    return <div className="error-kpi" style={{ color: darkMode ? '#fca5a5' : '#dc2626' }}>No se pudieron cargar los datos</div>;
+    return <div style={{ padding: '2rem', textAlign: 'center', color: '#dc2626' }}>No se pudieron cargar las métricas clave</div>;
   }
 
-  // MRR Actual (último valor)
-  const mrrActual = mrrData && mrrData.length > 0 ? parseFloat(mrrData[mrrData.length - 1].mrr_total) : 0;
-  const suscripcionesActivas = mrrData && mrrData.length > 0 ? mrrData[mrrData.length - 1].suscripciones_activas : 0;
+  const ultimoMrr = mrrData && mrrData.length > 0 ? parseFloat(mrrData[mrrData.length - 1].mrr_total) : 0;
+  const penultimoMrr = mrrData && mrrData.length > 1 ? parseFloat(mrrData[mrrData.length - 2].mrr_total) : ultimoMrr;
+  const mrrPorcentajeCambio = penultimoMrr > 0 ? ((ultimoMrr - penultimoMrr) / penultimoMrr) * 100 : 0;
 
-  // Churn actual
-  const churnActual = churnData && churnData.length > 0 ? parseFloat(churnData[churnData.length - 1].churn_rate) : 0;
+  // Modificado para tomar el penúltimo mes debido a datos incompletos en el mes activo
+  const ultimoChurn = churnData && churnData.length > 1 ? parseFloat(churnData[churnData.length - 2].churn_rate) : 0;
 
-  // LTV Promedio
-  const ltvPromedio = ltvData && ltvData.length > 0
-    ? ltvData
-        .filter(item => item.ltv_estimado !== null)
-        .reduce((sum, item) => sum + parseFloat(item.ltv_estimado), 0) /
-      ltvData.filter(item => item.ltv_estimado !== null).length
-    : 0;
+  const ltvValores = ltvData && Array.isArray(ltvData) ? ltvData.map(p => parseFloat(p.ltv_estimado || 0)).filter(v => v > 0) : [];
+  const ltvPromedio = ltvValores.length > 0 ? ltvValores.reduce((sum, v) => sum + v, 0) / ltvValores.length : 0;
 
-  // Determinar color del churn
-  const getChurnColor = (valor) => {
-    if (valor > 0.10) return '#ef4444'; // rojo
-    if (valor > 0.05) return '#f97316'; // naranja
-    return '#22c55e'; // verde
-  };
+  const suscripcionesActivas = mrrData && mrrData.length > 0 ? (mrrData[mrrData.length - 1].suscripciones_activas || mrrData[mrrData.length - 1].clientes_activos || 0) : 0;
 
-  const churnColor = getChurnColor(churnActual);
-
-  // Mini-gráficas (sparklines)
-  const mrrSparklineData = mrrData ? mrrData.map(item => ({
-    value: parseFloat(item.mrr_total)
-  })) : [];
-
-  const churnSparklineData = churnData ? churnData.map(item => ({
-    value: parseFloat(item.churn_rate) * 100
-  })) : [];
-
-  const ltvSparklineData = ltvData ? ltvData.filter(item => item.ltv_estimado !== null).map(item => ({
-    value: parseFloat(item.ltv_estimado)
-  })) : [];
-
-  const bgColor = darkMode ? '#1e293b' : '#ffffff';
-  const textPrimary = darkMode ? '#f1f5f9' : '#0f172a';
-  const textSecondary = darkMode ? '#94a3b8' : '#64748b';
-  const borderColor = darkMode ? '#334155' : '#e2e8f0';
+  const mrrSparklineData = mrrData ? mrrData.map(item => ({ value: parseFloat(item.mrr_total) })) : [];
+  const churnSparklineData = churnData ? churnData.map(item => ({ value: parseFloat(item.churn_rate) })) : [];
+  const ltvSparklineData = mrrData ? mrrData.map(() => ({ value: ltvPromedio })) : [];
 
   return (
-    <div className="kpi-cards-container">
-      {/* MRR Actual */}
-      <div className="kpi-card" style={{ backgroundColor: bgColor, border: `1px solid ${borderColor}` }}>
+    <div className="kpi-cards-grid">
+      {/* MRR Total */}
+      <div className={darkMode ? 'kpi-card card-dark' : 'kpi-card card-light'}>
         <div className="kpi-header">
-          <span className="kpi-label" style={{ color: textSecondary }}>MRR ACTUAL</span>
-          <TrendingUp size={18} style={{ color: '#3b82f6' }} />
+          <span className={darkMode ? 'kpi-label texto-secundario-dark' : 'kpi-label texto-secundario-light'}>MRR TOTAL</span>
+          <DollarSign size={18} style={{ color: '#3b82f6' }} />
         </div>
-        <div className="kpi-value" style={{ color: '#3b82f6' }}>
-          {formatearUSD(mrrActual)}
+        <div className="kpi-value kpi-value-azul">
+          {formatearUSD(ultimoMrr)}
+        </div>
+        <div className="kpi-footer">
+          {mrrPorcentajeCambio >= 0 ? (
+            <span className="kpi-trend trend-up"><TrendingUp size={14} /> {mrrPorcentajeCambio.toFixed(1)}%</span>
+          ) : (
+            <span className="kpi-trend trend-down"><TrendingDown size={14} /> {Math.abs(mrrPorcentajeCambio).toFixed(1)}%</span>
+          )}
+          <span className="kpi-subtext" style={{ color: darkMode ? '#94a3b8' : '#64748b' }}> vs mes anterior</span>
         </div>
         <div className="kpi-sparkline">
           <ResponsiveContainer width="100%" height={50}>
@@ -118,30 +105,30 @@ const KPICards = ({ darkMode }) => {
       </div>
 
       {/* Churn Rate */}
-      <div className="kpi-card" style={{ backgroundColor: bgColor, border: `1px solid ${borderColor}` }}>
+      <div className={darkMode ? 'kpi-card card-dark' : 'kpi-card card-light'}>
         <div className="kpi-header">
-          <span className="kpi-label" style={{ color: textSecondary }}>CHURN RATE</span>
-          <TrendingDown size={18} style={{ color: churnColor }} />
+          <span className={darkMode ? 'kpi-label texto-secundario-dark' : 'kpi-label texto-secundario-light'}>CHURN RATE</span>
+          <Users size={18} style={{ color: getChurnColor(ultimoChurn) }} />
         </div>
-        <div className="kpi-value" style={{ color: churnColor }}>
-          {formatearPorcentaje(churnActual)}
+        <div className="kpi-value" style={{ color: getChurnColor(ultimoChurn) }}>
+          {formatearPorcentaje(ultimoChurn)}
         </div>
         <div className="kpi-sparkline">
           <ResponsiveContainer width="100%" height={50}>
             <LineChart data={churnSparklineData}>
-              <Line type="monotone" dataKey="value" stroke={churnColor} dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="value" stroke={getChurnColor(ultimoChurn)} dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* LTV Promedio */}
-      <div className="kpi-card" style={{ backgroundColor: bgColor, border: `1px solid ${borderColor}` }}>
+      <div className={darkMode ? 'kpi-card card-dark' : 'kpi-card card-light'}>
         <div className="kpi-header">
-          <span className="kpi-label" style={{ color: textSecondary }}>LTV PROMEDIO</span>
+          <span className={darkMode ? 'kpi-label texto-secundario-dark' : 'kpi-label texto-secundario-light'}>LTV PROMEDIO</span>
           <DollarSign size={18} style={{ color: '#22c55e' }} />
         </div>
-        <div className="kpi-value" style={{ color: '#22c55e' }}>
+        <div className="kpi-value kpi-value-verde">
           {formatearUSD(ltvPromedio)}
         </div>
         <div className="kpi-sparkline">
@@ -154,12 +141,12 @@ const KPICards = ({ darkMode }) => {
       </div>
 
       {/* Suscripciones Activas */}
-      <div className="kpi-card" style={{ backgroundColor: bgColor, border: `1px solid ${borderColor}` }}>
+      <div className={darkMode ? 'kpi-card card-dark' : 'kpi-card card-light'}>
         <div className="kpi-header">
-          <span className="kpi-label" style={{ color: textSecondary }}>SUSCRIPCIONES ACTIVAS</span>
+          <span className={darkMode ? 'kpi-label texto-secundario-dark' : 'kpi-label texto-secundario-light'}>SUSCRIPCIONES ACTIVAS</span>
           <Users size={18} style={{ color: '#8b5cf6' }} />
         </div>
-        <div className="kpi-value" style={{ color: '#8b5cf6' }}>
+        <div className="kpi-value kpi-value-violeta">
           {suscripcionesActivas}
         </div>
         <div className="kpi-sparkline">
@@ -175,7 +162,3 @@ const KPICards = ({ darkMode }) => {
 };
 
 export default KPICards;
-
-
-
-
