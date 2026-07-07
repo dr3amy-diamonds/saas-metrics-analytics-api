@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { AlertTriangle, DollarSign, ChevronLeft, ChevronRight, UserCheck, Mail } from 'lucide-react';
+import { AlertTriangle, DollarSign, ChevronLeft, ChevronRight, Mail } from 'lucide-react';
 import '../styles/Dashboard.css';
 
 const DashboardCentral = () => {
@@ -46,6 +46,12 @@ const DashboardCentral = () => {
     }).format(cantidad);
   };
 
+  // El precio mensual por cliente no viene en detalle_clientes
+  // Se calcula dividiendo el MRR total en riesgo entre el total de clientes
+  const mrrPorCliente = totalRegistros > 0
+    ? (datos.resumen_ejecutivo?.mrr_en_riesgo_usd || 0) / totalRegistros
+    : 0;
+
   return (
     <div className="contenedor-dashboard">
       <div className="encabezado-dashboard">
@@ -56,66 +62,90 @@ const DashboardCentral = () => {
       </div>
 
       {/* Resumen de Métricas Críticas */}
-      <div className="kpi-cards-grid" style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
-        <div className="kpi-card card-light" style={{ backgroundColor: '#ffffff', padding: '1.5rem', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-          <div className="kpi-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <span className="kpi-label" style={{ fontSize: '0.75rem', fontWeight: '600', color: '#64748b' }}>MRR EN RIESGO TOTAL</span>
+      <div style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+        <div style={{ backgroundColor: '#ffffff', padding: '1.5rem', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>MRR EN RIESGO TOTAL</span>
             <DollarSign size={18} style={{ color: '#ef4444' }} />
           </div>
-          <div className="kpi-value" style={{ fontSize: '1.75rem', fontWeight: '800', color: '#0f172a' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#0f172a' }}>
             {formatearUSD(datos.resumen_ejecutivo?.mrr_en_riesgo_usd || 0)}
           </div>
         </div>
 
-        <div className="kpi-card card-light" style={{ backgroundColor: '#ffffff', padding: '1.5rem', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-          <div className="kpi-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <span className="kpi-label" style={{ fontSize: '0.75rem', fontWeight: '600', color: '#64748b' }}>CLIENTES BAJO ANÁLISIS</span>
+        <div style={{ backgroundColor: '#ffffff', padding: '1.5rem', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>CLIENTES BAJO ANÁLISIS</span>
             <AlertTriangle size={18} style={{ color: '#f59e0b' }} />
           </div>
-          <div className="kpi-value" style={{ fontSize: '1.75rem', fontWeight: '800', color: '#0f172a' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#0f172a' }}>
             {totalRegistros}
           </div>
         </div>
       </div>
 
       {/* Listado Detallado de Clientes */}
-      <div className="seccion-tabla" style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '1.5rem', overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
-              <th style={{ padding: '1rem' }}>Cliente</th>
-              <th style={{ padding: '1rem' }}>Plan Actual</th>
-              <th style={{ padding: '1rem' }}>Impacto MRR</th>
-              <th style={{ padding: '1rem' }}>Indicador de Alerta</th>
-              <th style={{ padding: '1rem', textAlign: 'center' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clientesActuales.map((c, idx) => (
-              <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.95rem', color: '#0f172a' }}>
-                <td style={{ padding: '1rem', fontWeight: '500' }}>{c.cliente}</td>
-                <td style={{ padding: '1rem' }}>{c.plan_name || c.plan}</td>
-                <td style={{ padding: '1rem', fontWeight: '600' }}>
-                  {formatearUSD(c.monthly_price || 0)}
-                </td>
-                <td style={{ padding: '1rem' }}>
-                  <span className="badge-inactividad" style={{ padding: '0.25rem 0.5rem', borderRadius: '6px', backgroundColor: '#fee2e2', color: '#991b1b', fontSize: '0.85rem', fontWeight: '500' }}>
-                    {c.dias_inactivo} días inactivo
-                  </span>
-                </td>
-                <td style={{ padding: '1rem', textAlign: 'center' }}>
-                  <button style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', padding: '0.4rem 0.75rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '500', color: '#334155' }}>
-                    <Mail size={14} /> Contactar
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="seccion-tabla">
+        <div className="acciones-encabezado-tabla">
+          <h3 className="subtitulo-seccion">Clientes con Inactividad Mayor a 15 Días</h3>
+          <span className="contador-filas">
+            Mostrando <strong>{indicePrimerRegistro + 1}-{Math.min(indiceUltimoRegistro, totalRegistros)}</strong> de <strong>{totalRegistros}</strong> clientes
+          </span>
+        </div>
 
-        {/* Componente de Paginación */}
+        <div className="contenedor-tabla">
+          <table className="tabla-corporativa">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Plan Actual</th>
+                <th>Arquetipo</th>
+                <th>Indicador de Alerta</th>
+                <th style={{ textAlign: 'center' }}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clientesActuales.map((c, idx) => (
+                <tr key={idx} className="fila-tabla-interactiva">
+                  <td>
+                    <div className="celda-informacion-cliente">
+                      <span className="nombre-cliente">{c.cliente}</span>
+                      <span className="correo-cliente">{c.email}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="celda-plan">
+                      <span className="nombre-plan">{c.plan}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`etiqueta-arquetipo ${c.clase_css_arquetipo}`}>
+                      {c.arquetipo_exhibicion}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="celda-actividad">
+                      <span className="etiqueta-peligro">
+                        {typeof c.dias_inactivo === 'number' ? `${c.dias_inactivo} días inactivo` : c.dias_inactivo}
+                      </span>
+                      <span className="ultima-conexion">Última Conexión: {c.ultima_conexion}</span>
+                    </div>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <button className="boton-disparador-accion">
+                      <Mail size={14} style={{ marginRight: '6px' }} />
+                      Contactar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Paginación */}
         {totalPaginas > 1 && (
-          <div className="contenedor-paginacion" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem' }}>
+          <div className="contenedor-paginacion">
             <button
               className="boton-paginacion"
               onClick={() => cambiarPagina(paginaActual - 1)}
